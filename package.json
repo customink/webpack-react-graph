@@ -1,0 +1,9 @@
+{
+  "name": "webpack-react-graph",
+  "version": "0.0.1",
+  "description": "A webpack plugin to create a graph visualization of a React component tree",
+  "author": "Joshua J. Born",
+  "dependencies": {
+    "vis": "^4.9.0"
+  }
+}
