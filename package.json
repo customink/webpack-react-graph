@@ -3,6 +3,21 @@
   "version": "0.0.1",
   "description": "A webpack plugin to create a graph visualization of a React component tree",
   "author": "Joshua J. Born",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshuaborn/webpack-react-graph.git"
+  },
+  },
+  "keywords": [
+    "graph",
+    "tree",
+    "visualization",
+    "react",
+    "flux",
+    "webpack",
+    "plugin",
+    "component"
+  ],
   "dependencies": {
     "vis": "^4.9.0"
   }
