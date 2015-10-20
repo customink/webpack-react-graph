@@ -14,9 +14,15 @@ var COLORS = {
 };
 
 function findModule(compilation, rawRequest) {
-  return compilation.modules.find(function(module) {
-    return module.rawRequest === rawRequest;
-  });
+  var i;
+  var module;
+  for (i = 0; i < compilation.modules.length; i++) {
+    module = compilation.modules[i];
+    if (module.rawRequest.indexOf(rawRequest) > -1) {
+      return module;
+    }
+  }
+  return null;
 }
 
 function assetDescriptionFromFile(file, script) {
@@ -52,7 +58,12 @@ function ReactGraphPlugin(options) {
 
 ReactGraphPlugin.prototype.apply = function(compiler) {
   compiler.plugin('emit', function(compilation, callback) {
-    this.processModule(findModule(compilation, path.join(this.componentsDirectory, this.rootComponent)));
+    var rawRequest = path.join(this.componentsDirectory, this.rootComponent);
+    var rootModule = findModule(compilation, rawRequest);
+    if (rootModule === null) {
+      throw new Error('Root component not found. No module with rawRequest ' + rawRequest);
+    }
+    this.processModule(rootModule);
     compilation.assets[path.join(this.targetDirectory, VIS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_FILENAME));
     compilation.assets[path.join(this.targetDirectory, VIS_CSS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_CSS_FILENAME));
     compilation.assets[path.join(this.targetDirectory, HTML_FILENAME)] = assetDescriptionFromFile(path.join(__dirname, HTML_FILENAME), this.inlinedScript());
@@ -77,7 +88,16 @@ ReactGraphPlugin.prototype.processModule = function(module) {
 };
 
 ReactGraphPlugin.prototype.componentName = function(module) {
-  return module.rawRequest.replace(this.componentsDirectory, '');
+  var dirs;
+  if (path.basename(module.rawRequest) === 'index') {
+    dirs = path.sep(path.dirname(module.rawRequest));
+    return dirs[dirs.length - 1];
+  } else {
+    console.log('');
+    console.log(module.rawRequest);
+    console.log(path.parse(module.rawRequest).name);
+    return path.basename(path.parse(module.rawRequest).name);
+  }
 };
 
 ReactGraphPlugin.prototype.checkForActions = function(module) {
