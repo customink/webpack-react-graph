@@ -1,5 +1,7 @@
-var assert = require('chai').assert;
+var chai = require('chai');
+var expect = chai.expect;
 var sinon = require('sinon');
+var sinonChai = require('sinon-chai');
 var webpack = require('webpack');
 var path = require('path');
 var fs = require('fs');
@@ -27,6 +29,8 @@ var WEBPACK_CONFIG = {
   },
   plugins: [ new ReactGraphPlugin({ components: '.' }) ],
 };
+
+chai.use(sinonChai);
 
 function fileExists(arg) {
   try {
@@ -77,7 +81,7 @@ describe('A build', function() {
   it('generates the bundle.js', function(done) {
     this.compiler.run(function(err, stats) {
       if (err) throw err;
-      assert(fileExists(BUNDLE_PATH));
+      expect(fileExists(BUNDLE_PATH)).to.be.true;
       done();
     });
   });
@@ -85,10 +89,10 @@ describe('A build', function() {
   it('generates the graph directory and its contents', function(done) {
     this.compiler.run(function(err, stats) {
       if (err) throw err;
-      assert(dirExists(GRAPH_PATH));
-      assert(fileExists(path.join(GRAPH_PATH, 'index.html')));
-      assert(fileExists(path.join(GRAPH_PATH, 'vis.min.js')));
-      assert(fileExists(path.join(GRAPH_PATH, 'vis.min.css')));
+      expect(dirExists(GRAPH_PATH)).to.be.true;
+      expect(fileExists(path.join(GRAPH_PATH, 'index.html'))).to.be.true;
+      expect(fileExists(path.join(GRAPH_PATH, 'vis.min.js'))).to.be.true;
+      expect(fileExists(path.join(GRAPH_PATH, 'vis.min.css'))).to.be.true;
       done();
     });
   });
@@ -102,16 +106,16 @@ describe('ReactGraphPlugin', function() {
     });
 
     it('initializes the graph object', function() {
-      assert.isUndefined(this.plugin.graph);
+      expect(this.plugin.graph).is.undefined;
       this.plugin.generateGraph();
-      assert.deepEqual(this.plugin.graph, { nodes: [], edges: [] });
+      expect(this.plugin.graph).to.deep.equal({ nodes: [], edges: [] });
     });
 
     it('calls generateGraphNode on the root component', function() {
       var dummy = 'rootComponent';
       this.plugin.rootComponent = dummy;
       this.plugin.generateGraph();
-      assert(this.plugin.generateGraphNode.calledWith(dummy, 0, 0));
+      expect(this.plugin.generateGraphNode).to.have.been.calledWith(dummy, 0, 0);
     });
   });
 });
