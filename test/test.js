@@ -90,6 +90,9 @@ describe('Graph files', function() {
     compiler.run(function(err, stats) {
       if (err) throw err;
       assert(dirExists(GRAPH_PATH));
+      assert(fileExists(path.join(GRAPH_PATH, 'index.html')));
+      assert(fileExists(path.join(GRAPH_PATH, 'vis.min.js')));
+      assert(fileExists(path.join(GRAPH_PATH, 'vis.min.css')));
       done();
     });
   });
