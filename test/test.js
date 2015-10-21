@@ -1,4 +1,5 @@
-var assert = require('assert');
+var assert = require('chai').assert;
+var sinon = require('sinon');
 var webpack = require('webpack');
 var path = require('path');
 var fs = require('fs');
@@ -89,6 +90,28 @@ describe('A build', function() {
       assert(fileExists(path.join(GRAPH_PATH, 'vis.min.js')));
       assert(fileExists(path.join(GRAPH_PATH, 'vis.min.css')));
       done();
+    });
+  });
+});
+
+describe('ReactGraphPlugin', function() {
+  describe('#generateGraph', function() {
+    beforeEach(function() {
+      this.plugin = new ReactGraphPlugin({});
+      this.plugin.generateGraphNode = sinon.spy();
+    });
+
+    it('initializes the graph object', function() {
+      assert.isUndefined(this.plugin.graph);
+      this.plugin.generateGraph();
+      assert.deepEqual(this.plugin.graph, { nodes: [], edges: [] });
+    });
+
+    it('calls generateGraphNode on the root component', function() {
+      var dummy = 'rootComponent';
+      this.plugin.rootComponent = dummy;
+      this.plugin.generateGraph();
+      assert(this.plugin.generateGraphNode.calledWith(dummy, 0, 0));
     });
   });
 });
