@@ -23,16 +23,9 @@ var WEBPACK_CONFIG = {
         loader: 'babel'
       }
     ]
-  }
+  },
+  plugins: [ new ReactGraphPlugin({ components: '.' }) ],
 };
-var PLUGIN_CONFIG = Object.create(WEBPACK_CONFIG, {
-  plugins: {
-    value: [ new ReactGraphPlugin({
-      components: '.'
-    }) ],
-    writable: true
-  }
-});
 
 function fileExists(arg) {
   try {
@@ -70,24 +63,26 @@ function removeDirIfExists(arg) {
   }
 }
 
-describe('The bundle.js', function() {
-  it('is built', function(done) {
-    var compiler = webpack(WEBPACK_CONFIG);
+describe('A build', function() {
+  before(function() {
+    this.compiler = webpack(WEBPACK_CONFIG);
+  });
+
+  beforeEach(function() {
     removeFileIfExists(BUNDLE_PATH);
-    compiler.run(function(err, stats) {
+    removeDirIfExists(GRAPH_PATH);
+  });
+
+  it('generates the bundle.js', function(done) {
+    this.compiler.run(function(err, stats) {
       if (err) throw err;
       assert(fileExists(BUNDLE_PATH));
-      removeFileIfExists(BUNDLE_PATH);
       done();
     });
   });
-});
 
-describe('Graph files', function() {
-  it('are generated', function(done) {
-    var compiler = webpack(PLUGIN_CONFIG);
-    removeDirIfExists(GRAPH_PATH);
-    compiler.run(function(err, stats) {
+  it('generates the graph directory and its contents', function(done) {
+    this.compiler.run(function(err, stats) {
       if (err) throw err;
       assert(dirExists(GRAPH_PATH));
       assert(fileExists(path.join(GRAPH_PATH, 'index.html')));
