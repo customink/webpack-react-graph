@@ -18,7 +18,8 @@ function findModule(compilation, rawRequest) {
   var module;
   for (i = 0; i < compilation.modules.length; i++) {
     module = compilation.modules[i];
-    if (module.rawRequest.indexOf(rawRequest) > -1) {
+    if (module.rawRequest !== undefined &&
+        module.rawRequest.indexOf(rawRequest) > -1) {
       return module;
     }
   }
