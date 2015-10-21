@@ -93,9 +93,6 @@ ReactGraphPlugin.prototype.componentName = function(module) {
     dirs = path.sep(path.dirname(module.rawRequest));
     return dirs[dirs.length - 1];
   } else {
-    console.log('');
-    console.log(module.rawRequest);
-    console.log(path.parse(module.rawRequest).name);
     return path.basename(path.parse(module.rawRequest).name);
   }
 };
