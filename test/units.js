@@ -42,6 +42,11 @@ describe('ReactGraphPlugin', function() {
       this.module._source._value = fs.readFileSync(path.join(__dirname, '..', 'index.js'));
       expect(this.plugin.componentName(this.module)).to.be.null;
     });
+
+    it('returns null when there is no source', function() {
+      delete this.module['_source'];
+      expect(this.plugin.componentName(this.module)).to.be.null;
+    });
   });
 
   describe('#findComponent', function() {

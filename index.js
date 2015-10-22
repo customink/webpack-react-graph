@@ -79,10 +79,17 @@ ReactGraphPlugin.prototype.processComponent = function(module) {
 };
 
 ReactGraphPlugin.prototype.componentName = function(module) {
-  var source = module._source._value;
-  var displayNameResult = /displayName\s*[:=]\s*['"](.+)['"]/.exec(source);
-  var classNameResult = /class\s+(\w+)\s+extends\s+Component/.exec(source);
-  var variableNameResult = /var\s+(\w+)\s+=\s+React.createClass/.exec(source);
+  var source;
+  var displayNameResult;
+  var classNameResult;
+  var variableNameResult;
+  if (module._source === undefined) {
+    return null;
+  }
+  source = module._source._value;
+  displayNameResult = /displayName\s*[:=]\s*['"](.+)['"]/.exec(source);
+  classNameResult = /class\s+(\w+)\s+extends\s+Component/.exec(source);
+  variableNameResult = /var\s+(\w+)\s+=\s+React.createClass/.exec(source);
   if (displayNameResult !== null) {
     return displayNameResult[1];
   } else if (classNameResult !== null) {
