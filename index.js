@@ -13,19 +13,6 @@ var COLORS = {
   BLUE: '#10a6df'
 };
 
-function findModule(compilation, rawRequest) {
-  var i;
-  var module;
-  for (i = 0; i < compilation.modules.length; i++) {
-    module = compilation.modules[i];
-    if (module.rawRequest !== undefined &&
-        module.rawRequest.indexOf(rawRequest) > -1) {
-      return module;
-    }
-  }
-  return null;
-}
-
 function assetDescriptionFromFile(file, script) {
   var buffer = fs.readFileSync(file);
   var description = {
@@ -49,7 +36,6 @@ function requestHasSubstring(module, substring) {
 }
 
 function ReactGraphPlugin(options) {
-  this.componentsDirectory = options.components || 'components/';
   this.rootComponent = options.root || 'App';
   this.actionsDirectory = options.actions || 'actions/';
   this.storesDirectory = options.stores || 'stores/';
@@ -59,10 +45,9 @@ function ReactGraphPlugin(options) {
 
 ReactGraphPlugin.prototype.apply = function(compiler) {
   compiler.plugin('emit', function(compilation, callback) {
-    var rawRequest = path.join(this.componentsDirectory, this.rootComponent);
-    var rootModule = findModule(compilation, rawRequest);
-    if (rootModule === null) {
-      throw new Error('Root component not found. No module with rawRequest ' + rawRequest);
+    var rootComponent = this.findComponent(compilation, this.rootComponent);
+    if (rootComponent === null) {
+      throw new Error('Root component not found. No component with name' + this.rootComponent);
     }
     this.processComponent(rootComponent);
     compilation.assets[path.join(this.targetDirectory, VIS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_FILENAME));
@@ -73,16 +58,21 @@ ReactGraphPlugin.prototype.apply = function(compiler) {
 };
 
 ReactGraphPlugin.prototype.processComponent = function(module) {
-  if (typeof this.components[this.componentName(module)] === 'undefined') {
+  var componentName = this.componentName(module);
+  if (typeof this.components[componentName] === 'undefined') {
     this.components[this.componentName(module)] = {
       dispatchesActions: this.checkForActions(module),
       connectsToStore: this.checkForStoreConnection(module),
       children: []
     };
     module.dependencies.forEach(function(dependency) {
-      if (requestHasSubstring(dependency, this.componentsDirectory)) {
-        this.components[this.componentName(module)].children.push(this.componentName(dependency.module));
-        this.processComponent(dependency.module);
+      var dependencyName;
+      if (dependency.module !== null) {
+        dependencyName = this.componentName(dependency.module);
+        if (dependencyName != null) {
+          this.components[componentName].children.push(this.componentName(dependency.module));
+          this.processComponent(dependency.module);
+        }
       }
     }.bind(this));
   }
@@ -103,6 +93,18 @@ ReactGraphPlugin.prototype.componentName = function(module) {
     return null;
   }
 };
+
+ReactGraphPlugin.prototype.findComponent = function(compilation, name) {
+  var i;
+  var module;
+  for (i = 0; i < compilation.modules.length; i++) {
+    module = compilation.modules[i];
+    if (this.componentName(module) === name) {
+      return module;
+    }
+  }
+  return null;
+}
 
 ReactGraphPlugin.prototype.checkForActions = function(module) {
   return module.dependencies.some(function(dependency) {

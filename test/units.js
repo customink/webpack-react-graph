@@ -44,6 +44,41 @@ describe('ReactGraphPlugin', function() {
     });
   });
 
+  describe('#findComponent', function() {
+    before(function() {
+      this.plugin = new ReactGraphPlugin({});
+      this.sectionModule = {
+        _source:
+        {
+          _value: fs.readFileSync(path.join(__dirname, 'fixtures', 'Section.js'))
+        }
+      };
+      this.compilation = {
+        modules: [
+          { _source:
+            {
+              _value: fs.readFileSync(path.join(__dirname, 'fixtures', 'Body.js'))
+            }
+          },
+          this.sectionModule,
+          { _source:
+            {
+              _value: fs.readFileSync(path.join(__dirname, 'fixtures', 'Panel.js'))
+            }
+          }
+        ]
+      };
+    });
+
+    it('returns the module entry for a component', function() {
+      expect(this.plugin.findComponent(this.compilation, 'Section')).to.equal(this.sectionModule);
+    });
+
+    it('returns null when there is no such component in the modules', function() {
+      expect(this.plugin.findComponent(this.compilation, 'Foobar')).to.be.null;
+    });
+  });
+
   describe('#generateGraph', function() {
     beforeEach(function() {
       this.plugin = new ReactGraphPlugin({});
