@@ -89,12 +89,18 @@ ReactGraphPlugin.prototype.processModule = function(module) {
 };
 
 ReactGraphPlugin.prototype.componentName = function(module) {
-  var dirs;
-  if (path.basename(module.rawRequest) === 'index') {
-    dirs = path.sep(path.dirname(module.rawRequest));
-    return dirs[dirs.length - 1];
+  var source = module._source._value;
+  var displayNameResult = /displayName\s*[:=]\s*['"](.+)['"]/.exec(source);
+  var classNameResult = /class\s+(\w+)\s+extends\s+Component/.exec(source);
+  var variableNameResult = /var\s+(\w+)\s+=\s+React.createClass/.exec(source);
+  if (displayNameResult !== null) {
+    return displayNameResult[1];
+  } else if (classNameResult !== null) {
+    return classNameResult[1];
+  } else if (variableNameResult !== null) {
+    return variableNameResult[1];
   } else {
-    return path.basename(path.parse(module.rawRequest).name);
+    return null;
   }
 };
 

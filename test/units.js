@@ -2,11 +2,48 @@ var chai = require('chai');
 var expect = chai.expect;
 var sinon = require('sinon');
 var sinonChai = require('sinon-chai');
+var fs = require('fs');
+var path = require('path');
 var ReactGraphPlugin = require('../index.js');
 
 chai.use(sinonChai);
 
 describe('ReactGraphPlugin', function() {
+  describe('#componentName', function() {
+    before(function() {
+      this.plugin = new ReactGraphPlugin({});
+    });
+
+    beforeEach(function() {
+      this.module = { _source: {} };
+    });
+
+    it('returns the displayName if present with the #createClass syntax', function() {
+      this.module._source._value = fs.readFileSync(path.join(__dirname, 'fixtures', 'App.js'));
+      expect(this.plugin.componentName(this.module)).to.equal('App');
+    });
+
+    it('returns the displayName if present with the ES2015 class syntax', function() {
+      this.module._source._value = fs.readFileSync(path.join(__dirname, 'fixtures', 'App', 'class-syntax-with-displayName.js'));
+      expect(this.plugin.componentName(this.module)).to.equal('App');
+    });
+
+    it('returns the class name of the component if present', function() {
+      this.module._source._value = fs.readFileSync(path.join(__dirname, 'fixtures', 'App', 'class-syntax.js'));
+      expect(this.plugin.componentName(this.module)).to.equal('App');
+    });
+
+    it('returns the name of the variable to which the component is assigned if present', function() {
+      this.module._source._value = fs.readFileSync(path.join(__dirname, 'fixtures', 'App', 'variable-name.js'));
+      expect(this.plugin.componentName(this.module)).to.equal('App');
+    });
+
+    it('returns null when the source is not for a React component', function() {
+      this.module._source._value = fs.readFileSync(path.join(__dirname, '..', 'index.js'));
+      expect(this.plugin.componentName(this.module)).to.be.null;
+    });
+  });
+
   describe('#generateGraph', function() {
     beforeEach(function() {
       this.plugin = new ReactGraphPlugin({});
