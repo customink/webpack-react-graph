@@ -3,6 +3,7 @@
   "version": "0.0.4",
   "description": "A webpack plugin to create a graph visualization of a React component tree",
   "author": "Joshua J. Born",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/customink/webpack-react-graph.git"
