@@ -64,7 +64,7 @@ ReactGraphPlugin.prototype.apply = function(compiler) {
     if (rootModule === null) {
       throw new Error('Root component not found. No module with rawRequest ' + rawRequest);
     }
-    this.processModule(rootModule);
+    this.processComponent(rootComponent);
     compilation.assets[path.join(this.targetDirectory, VIS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_FILENAME));
     compilation.assets[path.join(this.targetDirectory, VIS_CSS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_CSS_FILENAME));
     compilation.assets[path.join(this.targetDirectory, HTML_FILENAME)] = assetDescriptionFromFile(path.join(__dirname, HTML_FILENAME), this.inlinedScript());
@@ -72,7 +72,7 @@ ReactGraphPlugin.prototype.apply = function(compiler) {
   }.bind(this));
 };
 
-ReactGraphPlugin.prototype.processModule = function(module) {
+ReactGraphPlugin.prototype.processComponent = function(module) {
   if (typeof this.components[this.componentName(module)] === 'undefined') {
     this.components[this.componentName(module)] = {
       dispatchesActions: this.checkForActions(module),
@@ -82,7 +82,7 @@ ReactGraphPlugin.prototype.processModule = function(module) {
     module.dependencies.forEach(function(dependency) {
       if (requestHasSubstring(dependency, this.componentsDirectory)) {
         this.components[this.componentName(module)].children.push(this.componentName(dependency.module));
-        this.processModule(dependency.module);
+        this.processComponent(dependency.module);
       }
     }.bind(this));
   }
