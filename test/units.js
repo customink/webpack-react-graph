@@ -84,6 +84,46 @@ describe('ReactGraphPlugin', function() {
     });
   });
 
+  describe('#inlinedScript', function() {
+    beforeEach(function() {
+      this.plugin = new ReactGraphPlugin({});
+    });
+
+    it('calls #generateGraph when the graph data are undefined', function() {
+      this.plugin.generateGraph = sinon.spy(function() {
+        this.graph = {};
+      }.bind(this.plugin));
+      this.plugin.inlinedScript();
+      expect(this.plugin.generateGraph).to.have.been.called;
+    });
+
+    it('returns a stringified version of the graph data', function() {
+      var graphData = {
+        nodes: [
+          {id: 0, label: 'App', color: '#10a6df'},
+          {id: 1, label: 'Header', color: '#10a6df'},
+          {id: 2, label: 'Body', color: '#10a6df'},
+          {id: 3, label: 'Panel', color: '#10a6df'},
+          {id: 4, label: 'Section', color: '#10a6df'},
+          {id: 5, label: 'Footer ', color: '#10a6df'}
+        ],
+        edges: [
+          {from: 0, to: 1},
+          {from: 2, to: 3},
+          {from: 2, to: 4},
+          {from: 0, to: 2},
+          {from: 0, to: 5}
+        ]
+      };
+      this.plugin.generateGraph = sinon.spy(function() {
+        this.graph = graphData;
+      }.bind(this.plugin));
+      expect(this.plugin.inlinedScript()).to.equal('var nodes = ' +
+          JSON.stringify(graphData.nodes) + '; var edges = ' +
+          JSON.stringify(graphData.edges) + ';');
+    });
+  });
+
   describe('#generateGraph', function() {
     beforeEach(function() {
       this.plugin = new ReactGraphPlugin({});
