@@ -47,7 +47,8 @@ ReactGraphPlugin.prototype.apply = function(compiler) {
   compiler.plugin('emit', function(compilation, callback) {
     var rootComponent = this.findComponent(compilation, this.rootComponent);
     if (rootComponent === null) {
-      throw new Error('Root component not found. No component with name' + this.rootComponent);
+      throw new Error('Root component not found. No component with name "' +
+          this.rootComponent + '"');
     }
     this.processComponent(rootComponent);
     compilation.assets[path.join(this.targetDirectory, VIS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_FILENAME));
