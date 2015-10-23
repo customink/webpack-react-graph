@@ -54,4 +54,7 @@ webpack build, use a path such as `../graph`.
 
 # TODO
 
-Keep writing tests.
+1. Add release notes.
+2. Write unit tests for remaining untested functions.
+3. Add a legend explaining what the colors of the nodes mean.
+4. Make the options for rendering the graph configurable.
