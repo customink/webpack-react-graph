@@ -84,7 +84,7 @@ ReactGraphPlugin.prototype.componentName = function(module) {
   var displayNameResult;
   var classNameResult;
   var variableNameResult;
-  if (module._source === undefined) {
+  if (module._source === undefined || module._source === null) {
     return null;
   }
   source = module._source._value;
