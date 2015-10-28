@@ -9,6 +9,62 @@ var ReactGraphPlugin = require('../index.js');
 chai.use(sinonChai);
 
 describe('ReactGraphPlugin', function() {
+  describe('#emitHandler', function() {
+    before(function() {
+      this.plugin = new ReactGraphPlugin({});
+    });
+
+    beforeEach(function() {
+      this.rootComponent = {};
+      this.plugin.findComponent = sinon.spy(function () {
+        return this.rootComponent;
+      }.bind(this));
+      this.plugin.processComponent = sinon.spy();
+      this.plugin.inlinedScript = sinon.spy();
+      this.compilation = { assets: {} };
+      this.callback = sinon.spy();
+    });
+
+    it('calls the compiler callback', function() {
+      this.plugin.emitHandler(this.compilation, this.callback);
+      expect(this.callback).to.have.been.called;
+    });
+
+    it('finds the root component and calls #processComponent with it', function() {
+      this.plugin.emitHandler(this.compilation, this.callback);
+      expect(this.plugin.findComponent).to.have.been.called;
+      expect(this.plugin.processComponent).to.have.been.calledWith(this.rootComponent);
+    });
+
+    it('throws an error when no root component is found', function() {
+      this.plugin.findComponent = sinon.spy(function() {
+        return null;
+      });
+      expect(function() {
+        this.plugin.emitHandler(this.compilation, this.callback);
+      }.bind(this)).to.throw(ReferenceError);
+    });
+
+    it('adds to the assets object in the compilation', function() {
+      this.plugin.emitHandler(this.compilation, this.callback);
+      expect(this.compilation.assets['graph/vis.min.js']).to.exist;
+      expect(this.compilation.assets['graph/vis.min.css']).to.exist;
+      expect(this.compilation.assets['graph/index.html']).to.exist;
+    });
+
+    it('throws an error and writes to stderr when the compilation object has errors', function() {
+      var stackMessage1 = 'stack message 1';
+      var stackMessage2 = 'stack message 2';
+      console.error = sinon.spy();
+      this.compilation.errors = [ { stack: stackMessage1 }, { stack: stackMessage2 } ];
+      expect(function() {
+        this.plugin.emitHandler(this.compilation, this.callback);
+      }.bind(this)).to.throw(Error);
+      expect(console.error).to.have.been.calledWith(stackMessage1);
+      expect(console.error).to.have.been.calledWith(stackMessage2);
+    });
+  });
+
   describe('#componentName', function() {
     before(function() {
       this.plugin = new ReactGraphPlugin({});

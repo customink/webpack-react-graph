@@ -44,18 +44,27 @@ function ReactGraphPlugin(options) {
 }
 
 ReactGraphPlugin.prototype.apply = function(compiler) {
-  compiler.plugin('emit', function(compilation, callback) {
-    var rootComponent = this.findComponent(compilation, this.rootComponent);
-    if (rootComponent === null) {
-      throw new Error('Root component not found. No component with name "' +
-          this.rootComponent + '"');
-    }
-    this.processComponent(rootComponent);
-    compilation.assets[path.join(this.targetDirectory, VIS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_FILENAME));
-    compilation.assets[path.join(this.targetDirectory, VIS_CSS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_CSS_FILENAME));
-    compilation.assets[path.join(this.targetDirectory, HTML_FILENAME)] = assetDescriptionFromFile(path.join(__dirname, HTML_FILENAME), this.inlinedScript());
-    callback();
-  }.bind(this));
+  compiler.plugin('emit', this.emitHandler.bind(this));
+};
+
+ReactGraphPlugin.prototype.emitHandler = function(compilation, callback) {
+  var rootComponent;
+  if (compilation['errors'] && compilation['errors'].length > 0) {
+    compilation['errors'].forEach(function(error) {
+      console.error(error.stack);
+    });
+    throw new Error('Compilation errors. See above.');
+  }
+  rootComponent = this.findComponent(compilation, this.rootComponent);
+  if (rootComponent === null) {
+    throw new ReferenceError('Root component not found. No component with name "' +
+        this.rootComponent + '"');
+  }
+  this.processComponent(rootComponent);
+  compilation.assets[path.join(this.targetDirectory, VIS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_FILENAME));
+  compilation.assets[path.join(this.targetDirectory, VIS_CSS_FILENAME)] = assetDescriptionFromFile(path.join(VIS_PATH, VIS_CSS_FILENAME));
+  compilation.assets[path.join(this.targetDirectory, HTML_FILENAME)] = assetDescriptionFromFile(path.join(__dirname, HTML_FILENAME), this.inlinedScript());
+  callback();
 };
 
 ReactGraphPlugin.prototype.processComponent = function(module) {
