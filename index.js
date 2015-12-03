@@ -1,9 +1,10 @@
 var fs = require('fs');
 var path = require('path');
 
-var VIS_PATH = path.join(__dirname, 'node_modules', 'vis', 'dist');
-var VIS_FILENAME = 'vis.min.js';
-var VIS_CSS_FILENAME = 'vis.min.css';
+var VIS = path.parse(require.resolve('vis'));
+var VIS_PATH = VIS.dir;
+var VIS_FILENAME = VIS.base;
+var VIS_CSS_FILENAME = VIS.name + '.css';
 var HTML_FILENAME = 'index.html';
 var REPLACEMENT_STRING = '<!-- webpack-react-graph -->';
 var COLORS = {
