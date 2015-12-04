@@ -54,7 +54,9 @@ ReactGraphPlugin.prototype.emitHandler = function(compilation, callback) {
     compilation['errors'].forEach(function(error) {
       console.error(error.stack);
     });
-    throw new Error('Compilation errors. See above.');
+    console.error('=======================================');
+    console.error(' COMPILATION ERRORS. SEE ABOVE. ');
+    console.error('=======================================');
   }
   rootComponent = this.findComponent(compilation, this.rootComponent);
   if (rootComponent === null) {

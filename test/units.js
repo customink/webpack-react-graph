@@ -52,14 +52,12 @@ describe('ReactGraphPlugin', function() {
       expect(this.compilation.assets['graph/index.html']).to.exist;
     });
 
-    it('throws an error and writes to stderr when the compilation object has errors', function() {
+    it('writes to stderr when the compilation object has errors', function() {
       var stackMessage1 = 'stack message 1';
       var stackMessage2 = 'stack message 2';
       console.error = sinon.spy();
       this.compilation.errors = [ { stack: stackMessage1 }, { stack: stackMessage2 } ];
-      expect(function() {
-        this.plugin.emitHandler(this.compilation, this.callback);
-      }.bind(this)).to.throw(Error);
+      this.plugin.emitHandler(this.compilation, this.callback);
       expect(console.error).to.have.been.calledWith(stackMessage1);
       expect(console.error).to.have.been.calledWith(stackMessage2);
     });
