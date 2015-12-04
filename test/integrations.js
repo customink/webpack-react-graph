@@ -24,7 +24,7 @@ var WEBPACK_CONFIG = {
       }
     ]
   },
-  plugins: [ new ReactGraphPlugin({}) ],
+  plugins: [ new ReactGraphPlugin({ legend: true }) ],
 };
 
 function fileExists(arg) {

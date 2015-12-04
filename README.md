@@ -15,7 +15,8 @@ plugins.push(new ReactGraphPlugin({
   root: 'App',
   actions: 'actions/',
   stores: 'stores/',
-  target: 'graph/'
+  target: 'graph/',
+  legend: false
 }));
 
 // var "plugins" passed into webpack config
@@ -31,18 +32,18 @@ from variable or class names of the component.
 
 ### actions
 
-For Flux applications, this is a request path substring directory that denotes the
+For Flux applications, this is a request path substring that denotes the
 file(s) that contain(s) the application's action creator(s). This is used to
-highlight with a different color components that dispatch actions. If any
+highlight components that dispatch actions with a different color. If any
 dependency of a component has a substring that matches this parameter, the
 component is considered to be dispatching actions.
 
 ### stores
 
-For Flux applications, this is a request path substring that denotes the file(s) that
-contain(s) the application's store(s). This is used to highlight with a
-different color components that access central state. If any dependency of a
-component has a substring that matches this parameter, the component is
+For Flux applications, this is a request path substring that denotes the
+file(s) that contain(s) the application's store(s). This is used to highlight
+components that access central state with a different color. If any dependency
+of a component has a substring that matches this parameter, the component is
 considered to be accessing central state.
 
 ### target
@@ -51,10 +52,15 @@ This is the location that built HTML, CSS, and JavaScript for the graph will be
 written. To avoid including the graph in the distributable of an application's
 webpack build, use a path such as `../graph`.
 
+### legend
+
+When this is set to true, four nodes are added to the generated graph. Each is
+of a different color, with a label that gives a shorthand for the highlight
+color indicates
+
 
 # TODO
 
 1. Add release notes.
 2. Write unit tests for remaining untested functions.
-3. Add a legend explaining what the colors of the nodes mean.
-4. Make the options for rendering the graph configurable.
+3. Make the options for rendering the graph configurable.

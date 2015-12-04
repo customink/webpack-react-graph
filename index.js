@@ -41,6 +41,7 @@ function ReactGraphPlugin(options) {
   this.actionsDirectory = options.actions || 'actions/';
   this.storesDirectory = options.stores || 'stores/';
   this.targetDirectory = options.target || 'graph';
+  this.generateLegend = options.legend || false;
   this.components = {};
 }
 
@@ -141,6 +142,9 @@ ReactGraphPlugin.prototype.checkForStoreConnection = function(module) {
 ReactGraphPlugin.prototype.inlinedScript = function() {
   if (typeof this.graph === 'undefined') {
     this.generateGraph();
+    if (this.generateLegend) {
+      this.addLegendToGraph();
+    }
   }
   return 'var nodes = ' + JSON.stringify(this.graph.nodes) + '; var edges = ' + JSON.stringify(this.graph.edges) + ';';
 };
@@ -158,7 +162,8 @@ ReactGraphPlugin.prototype.generateGraphNode = function(componentName) {
   var node = {
     id: this.graph.nodes.length,
     label: componentName,
-    color: COLORS.BLUE
+    color: COLORS.BLUE,
+    group: 0
   };
   if (component.dispatchesActions && component.connectsToStore) {
     node.color = COLORS.BROWN;
@@ -176,6 +181,25 @@ ReactGraphPlugin.prototype.generateGraphNode = function(componentName) {
     });
   }.bind(this));
   return node;
+};
+
+ReactGraphPlugin.prototype.addLegendToGraph = function() {
+  var brownNodeId = this.addLegendNodeToGraph(COLORS.BROWN, 'Store and Actions');
+  var redNodeId = this.addLegendNodeToGraph(COLORS.RED, 'Store');
+  var orangeNodeId = this.addLegendNodeToGraph(COLORS.ORANGE, 'Actions');
+  var blueNodeId = this.addLegendNodeToGraph(COLORS.BLUE, 'Pure');
+};
+
+ReactGraphPlugin.prototype.addLegendNodeToGraph = function(color, label) {
+  var id = this.graph.nodes.length;
+  this.graph.nodes.push({
+    id: id,
+    label: label,
+    color: color,
+    shape: 'box',
+    group: 1
+  });
+  return id;
 };
 
 module.exports = ReactGraphPlugin;

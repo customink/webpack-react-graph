@@ -140,15 +140,17 @@ describe('ReactGraphPlugin', function() {
 
   describe('#inlinedScript', function() {
     beforeEach(function() {
-      this.plugin = new ReactGraphPlugin({});
+      this.plugin = new ReactGraphPlugin({ legend: true });
     });
 
-    it('calls #generateGraph when the graph data are undefined', function() {
+    it('calls #generateGraph and #addLegendToGraph when the graph data are undefined', function() {
       this.plugin.generateGraph = sinon.spy(function() {
         this.graph = {};
       }.bind(this.plugin));
+      this.plugin.addLegendToGraph = sinon.spy();
       this.plugin.inlinedScript();
       expect(this.plugin.generateGraph).to.have.been.called;
+      expect(this.plugin.addLegendToGraph).to.have.been.called;
     });
 
     it('returns a stringified version of the graph data', function() {
